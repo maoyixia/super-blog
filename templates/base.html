@@ -7,14 +7,16 @@
 </head>
 
 <body>
-  <a href="/blog" class="main-title">
-    Yixia Blog
+  <a href="/" class="main-title">
+    Super Blog
   </a>
 
   <div id="content">
   {% block content %}
   {% endblock %}
   </div>
+
+  <a href="{{ url|safe }}">{{ url_linktext }}</a>
 </body>
 
 </html>
