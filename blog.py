@@ -84,8 +84,15 @@ class Profile(BlogHandler):
         blogs = []
         for b in blogs_query.run():
             blogs.append(b)
+
+        # check if current user is blog owner
+        isOwner = False
+        if users.get_current_user():
+            if users.get_current_user().nickname() == author:
+                isOwner = True
+
         login_value = login(self)
-        self.render('profile.html', blogs = blogs, author = author, url = login_value[0], url_linktext = login_value[1])
+        self.render('profile.html', blogs = blogs, author = author, url = login_value[0], url_linktext = login_value[1], isOwner = isOwner)
 
 class BlogPage(BlogHandler):
     def get(self):
@@ -189,6 +196,17 @@ class EditPost(BlogHandler):
             error = "Please type in subject and content!"
             self.render("newpost.html", subject=subject, content=content, author = author, error=error)
 
+class DelPost(BlogHandler):
+
+    def get(self):
+        post_id = self.request.get('post_id')
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        blog_name = post.blog_name
+        db.delete(key)
+        time.sleep(1)
+        self.redirect('/blog?blog_name=%s' % blog_name)
+
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/profile', Profile),
@@ -197,5 +215,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newblog', NewBlog),
                                ('/newpost', NewPost),
                                ('/editpost', EditPost),
+                               ('/delpost', DelPost),
                                ],
                               debug=True)
