@@ -2,4 +2,9 @@
 
 {% block content %}
   {{post.render() | safe}}
+  <br><br>
+
+  <div>
+  	<a href="/blog?blog_name={{ blog_name }}">return to blog {{ blog_name }}</a><br>
+  </div>
 {% endblock %}

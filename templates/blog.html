@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h1>{{blog_name}}</h1>
+  <h3>{{author}}<h3>
+
+  {% for p in posts %}
+    {{ p.render() | safe }}
+    <br><br>
+  {% endfor %}
+
+  {% if isOwner %}
+  	<div>
+  		<a href="/newpost?blog_name={{ blog_name }}">Create a New Post</a>
+  	</div>
+  {% endif %}
+
+{% endblock %}

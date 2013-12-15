@@ -4,7 +4,25 @@
 
   {% for p in posts %}
     {{ p.render() | safe }}
-    <br><br>
+    <br><br><br>
   {% endfor %}
 
-{% endblock %}z
+  <div>
+  	<h1>Blog List:</h1>
+  	<ul>
+  		{% for b in blogs %}
+  		<li>
+  			<a href="/blog?blog_name={{ b.blog_name }}">{{ b.blog_name }}</a><br>
+  			wrote by {{ b.author }}
+  		</li>
+  		{% endfor %}
+  	</ul>
+  </div>
+
+  <div>
+  	{% if isLogin %}
+  		<a href="/profile?author={{ isLogin }}">Profile</a>
+  	{% endif %}
+  </div>
+
+{% endblock %}
