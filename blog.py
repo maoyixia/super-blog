@@ -44,6 +44,7 @@ def login(class_name):
 def blog_key(blog_name = 'default'):
     return db.Key.from_path('Blog', blog_name)
 
+# Post DB Model
 class Post(db.Model):
     author = db.StringProperty(required = True)
     blog_name = db.StringProperty(required = True)
@@ -57,6 +58,7 @@ class Post(db.Model):
         self._render_text = self.content.replace('\n', '<br>')
         return render_str("post.html", p = self)
 
+# Blog DB Model
 class Blog(db.Model):
     blog_name = db.StringProperty(required = True)
     author = db.StringProperty(required = True)
@@ -70,6 +72,7 @@ class MainPage(BlogHandler):
         for b in blogs_query.run():
             blogs.append(b)
 
+        # check if user has logged in
         isLogin = False
         if users.get_current_user():
             isLogin = users.get_current_user().nickname()
@@ -85,14 +88,16 @@ class Profile(BlogHandler):
         for b in blogs_query.run():
             blogs.append(b)
 
-        # check if current user is blog owner
+        # check if user has logged in and is owner
+        isLogin = False
         isOwner = False
         if users.get_current_user():
-            if users.get_current_user().nickname() == author:
+            isLogin = users.get_current_user().nickname()
+            if isLogin == author:
                 isOwner = True
 
         login_value = login(self)
-        self.render('profile.html', blogs = blogs, author = author, url = login_value[0], url_linktext = login_value[1], isOwner = isOwner)
+        self.render('profile.html', blogs = blogs, author = author, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
 
 class BlogPage(BlogHandler):
     def get(self):
@@ -101,15 +106,17 @@ class BlogPage(BlogHandler):
         blog = blog_query.get()
         author = blog.author
 
-        # check if current user is blog owner
+        # check if user has logged in and is owner
+        isLogin = False
         isOwner = False
         if users.get_current_user():
-            if users.get_current_user().nickname() == author:
+            isLogin = users.get_current_user().nickname()
+            if isLogin == author:
                 isOwner = True
 
         posts = db.GqlQuery("SELECT * FROM Post WHERE blog_name = :1 ORDER BY created DESC LIMIT 10", blog_name)
         login_value = login(self)
-        self.render('blog.html', blog_name = blog_name, author = author, posts = posts, url = login_value[0], url_linktext = login_value[1], isOwner = isOwner)
+        self.render('blog.html', blog_name = blog_name, author = author, posts = posts, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
 
 
 class PostPage(BlogHandler):
@@ -120,17 +127,19 @@ class PostPage(BlogHandler):
         blog_name = post.blog_name
         author = post.author
 
-        # check if current user is post owner
+        # check if user has logged in and is owner
+        isLogin = False
         isOwner = False
         if users.get_current_user():
-            if users.get_current_user().nickname() == author:
+            isLogin = users.get_current_user().nickname()
+            if isLogin == author:
                 isOwner = True
 
         if not post:
             self.error(404)
             return
 
-        self.render("permalink.html", post_id = post_id, post = post, blog_name = blog_name, isOwner = isOwner)
+        self.render("permalink.html", post_id = post_id, post = post, blog_name = blog_name, isLogin = isLogin, isOwner = isOwner)
 
 class NewBlog(BlogHandler):
     def get(self):

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link type="text/css" rel="stylesheet" href="/static/main.css" />
+
+  <title>Yixia Blog</title>
+</head>
+
+<body>
+  <a href="/" class="main-title">
+    Super Blog
+  </a>
+
+  <div id="content">
+  {% block content %}
+  {% endblock %}
+  </div>
+
+  <a href="{{ url|safe }}">{{ url_linktext }}</a>
+</body>
+
+</html>
+

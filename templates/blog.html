@@ -2,23 +2,25 @@
 
 {% block content %}
 
-  <h1>{{blog_name}}</h1>
-  <h3>Blogger: {{author}}<h3>
+<h1>{{blog_name}}</h1>
+<h4>Blogger: {{author}}<h4>
+	<br><br>
+	
+	{% for p in posts %}
+	{{ p.render() | safe }}
+	<a href='/post?post_id={{ p.key().id() }}'>more...</a>
+	<br><br>
+	{% endfor %}
+	
 
-  {% for p in posts %}
-    {{ p.render() | safe }}
-    <a href='/post?post_id={{ p.key().id() }}'>more...</a>
-    <br><br>
-  {% endfor %}
+	{% if isOwner %}
+	<div>
+		<a href="/newpost?blog_name={{ blog_name }}">Create a New Post</a>
+	</div>
 
-  {% if isOwner %}
-  	<div>
-  		<a href="/newpost?blog_name={{ blog_name }}">Create a New Post</a>
-  	</div>
+	<div>
+		<a href="/profile?author={{ author }}">Return to Profile</a>
+	</div>
+	{% endif %}
 
-  	<div>
-  		<a href="/profile?author={{ author }}">Return to Profile</a>
-  	</div>
-  {% endif %}
-
-{% endblock %}
+	{% endblock %}

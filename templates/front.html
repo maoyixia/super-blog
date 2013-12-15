@@ -2,28 +2,26 @@
 
 {% block content %}
 
-  {% for p in posts %}
-    {{ p.render() | safe }}
-    <a href='/post?post_id={{ p.key().id() }}'>more...</a>
-    <br><br>
-  {% endfor %}
-
-  <div>
-  	<h1>Blog List:</h1>
-  	<ul>
-  		{% for b in blogs %}
-  		<li>
-  			<a href="/blog?blog_name={{ b.blog_name }}">{{ b.blog_name }}</a><br>
-  			wrote by {{ b.author }}
-  		</li>
-  		{% endfor %}
-  	</ul>
-  </div>
-
-  <div>
-  	{% if isLogin %}
-  		<a href="/profile?author={{ isLogin }}">Profile</a>
-  	{% endif %}
-  </div>
+<div class="row">
+	<div class="col-xs-5 col-sm-3">
+		<ul class="nav nav-list">
+			<li class="nav-header"><h3>Blog List</h3></li>
+			{% for b in blogs %}
+			<li>
+				<a href="/blog?blog_name={{ b.blog_name }}">{{ b.blog_name }}</a> 
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by {{ b.author }}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div class="col-xs-11 col-sm-7">
+		<h3>Latest Posts</h3>
+		{% for p in posts %}
+		{{ p.render() | safe }}
+		<a href='/post?post_id={{ p.key().id() }}'>more...</a>
+		<br><br>
+		{% endfor %}
+	</div>
+</div>
 
 {% endblock %}
