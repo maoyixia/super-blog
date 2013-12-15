@@ -111,12 +111,19 @@ class PostPage(BlogHandler):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
         blog_name = post.blog_name
+        author = post.author
+
+        # check if current user is post owner
+        isOwner = False
+        if users.get_current_user():
+            if users.get_current_user().nickname() == author:
+                isOwner = True
 
         if not post:
             self.error(404)
             return
 
-        self.render("permalink.html", post = post, blog_name = blog_name)
+        self.render("permalink.html", post_id = post_id, post = post, blog_name = blog_name, isOwner = isOwner)
 
 class NewBlog(BlogHandler):
     def get(self):
@@ -154,11 +161,41 @@ class NewPost(BlogHandler):
             error = "Please type in subject and content!"
             self.render("newpost.html", subject=subject, content=content, author = author, error=error)
 
+class EditPost(BlogHandler):
+
+    def get(self):
+        post_id = self.request.get('post_id')
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        subject = post.subject
+        content = post.content
+        self.render("newpost.html", subject = subject, content = content)
+
+    def post(self):
+        post_id = self.request.get('post_id')
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+        author = str(users.get_current_user().nickname())
+        blog_name = self.request.get('blog_name')
+
+        if subject and content:
+            post.subject = subject
+            post.content = content
+            post.put()
+            self.redirect('/post?post_id=%s' % str(post.key().id()))
+        else:
+            error = "Please type in subject and content!"
+            self.render("newpost.html", subject=subject, content=content, author = author, error=error)
+
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/profile', Profile),
                                ('/blog', BlogPage),
                                ('/post', PostPage),
                                ('/newblog', NewBlog),
                                ('/newpost', NewPost),
+                               ('/editpost', EditPost),
                                ],
                               debug=True)

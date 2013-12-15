@@ -4,7 +4,8 @@
 
   {% for p in posts %}
     {{ p.render() | safe }}
-    <br><br><br>
+    <a href='/post?post_id={{ p.key().id() }}'>more...</a>
+    <br><br>
   {% endfor %}
 
   <div>

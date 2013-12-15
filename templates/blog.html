@@ -3,10 +3,11 @@
 {% block content %}
 
   <h1>{{blog_name}}</h1>
-  <h3>{{author}}<h3>
+  <h3>Blogger: {{author}}<h3>
 
   {% for p in posts %}
     {{ p.render() | safe }}
+    <a href='/post?post_id={{ p.key().id() }}'>more...</a>
     <br><br>
   {% endfor %}
 
