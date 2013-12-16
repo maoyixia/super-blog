@@ -4,22 +4,24 @@
 
 <h1>{{blog_name}}</h1>
 <h4>Blogger: {{author}}<h4>
-	<br><br>
-	
+	<br>
+
+	{% if isOwner %}
+	<div>
+		<h3><a href="/newpost?blog_name={{ blog_name }}">Create a New Post</a></h3>
+	</div>
+	{% endif %}	
+	<br>
+
 	{% for p in posts %}
 	{{ p.render_digest() | safe }}
 	<a href='/post?post_id={{ p.key().id() }}'>more...</a>
 	<br><br>
 	{% endfor %}
 	
-
 	{% if isOwner %}
 	<div>
-		<a href="/newpost?blog_name={{ blog_name }}">Create a New Post</a>
-	</div>
-
-	<div>
-		<a href="/profile?author={{ author }}">Return to Profile</a>
+		<h3><a href="/profile?author={{ author }}">Return to Profile</a></h3>
 	</div>
 	{% endif %}
 

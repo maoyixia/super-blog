@@ -7,7 +7,8 @@
   	<ul>
   		{% for b in blogs %}
   		<li>
-  			<a href="/blog?blog_name={{ b.blog_name }}">{{ b.blog_name }}</a>
+  			<h3><a href="/blog?blog_name={{ b.blog_name }}">{{ b.blog_name }}</a></h3>
+  			<br>
   		</li>
   		{% endfor %}
   	</ul>
@@ -15,7 +16,7 @@
 
 {% if isOwner %}
   <div>
-  	<a href="/newblog">Create a New Blog</a>
+  	<h4><a href="/newblog">Create a New Blog</a></h4>
   </div>
 {% endif %}
 

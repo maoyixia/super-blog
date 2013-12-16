@@ -1,17 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {{post.render() | safe}}
-  <br><br>
+{{post.render() | safe}}
+<br><br>
 
-  <div>
-  	{% if isOwner %}
-  		<a href="/editpost?post_id={{ post_id }}">Edit</a>
-  		<a href="/delpost?post_id={{ post_id }}">Delete</a>
-  	{% endif %}
-  </div>
-
-  <div>
-  	<a href="/blog?blog_name={{ blog_name }}">return to blog {{ blog_name }}</a><br>
-  </div>
-{% endblock %}
+<div>
+	{% if isOwner %}
+	<h3><a href="/editpost?post_id={{ post_id }}">Edit</a>
+		&nbsp; | &nbsp;
+		<a href="/delpost?post_id={{ post_id }}">Delete</a>
+	</h3>
+	{% endif %}
+	</div>
+	<br>
+	<div>
+		<h4><a href="/blog?blog_name={{ blog_name }}">Return to blog {{ blog_name }}</a><br></h4>
+	</div>
+	{% endblock %}

@@ -7,6 +7,8 @@
 		<ul class="nav nav-list">
 			{% if isLogin %}
 			<li class="active"><a href="/profile?author={{ isLogin }}"><h4>Your Blogs</h4></a></li>
+			{% else %}
+			<li class="active"><a href="{{ url|safe }}"><h4>{{ url_linktext }} and Create your own blogs!</h4></a></li>			
 			{% endif %}
 			<li class="nav-header"><h3>Blog List</h3></li>
 			{% for b in blogs %}
