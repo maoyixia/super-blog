@@ -16,4 +16,9 @@
   <div class="post-content">
     {{_render_text | safe}}
   </div>
+
+  <br>
+  <div>
+    last modified at: {{ last_modified.strftime("%b %d, %Y") }}
+  </div>
 </div>

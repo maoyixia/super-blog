@@ -44,6 +44,17 @@ def login(class_name):
 def blog_key(blog_name = 'default'):
     return db.Key.from_path('Blog', blog_name)
 
+# Convert url link and img link to HTML format
+def contentParser(mystr):
+    m = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', mystr)
+    result = mystr
+    for i in m:
+        if i[-4:] == '.jpg' or i[-4:] == '.png' or i[-4:] == '.gif':
+            result = result.replace(i, '<img src="' + i + '">')
+        else:
+            result = result.replace(i, '<a href="' + i + '">' + i + '</a>')
+    return result
+
 # Post DB Model
 class Post(db.Model):
     author = db.StringProperty(required = True)
@@ -55,12 +66,12 @@ class Post(db.Model):
     # tags = db.StringProperty(repeated=True)
 
     def render(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self._render_text)
+        self._render_text = contentParser(self.content).replace('\n', '<br>')
+        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self._render_text, last_modified = self.last_modified)
 
     def render_digest(self):
-        self.digest = self.content[0:500].replace('\n', '<br>')
-        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self.digest)
+        self.digest = contentParser(self.content[0:500]).replace('\n', '<br>')
+        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self.digest, last_modified = self.last_modified)
 
 # Blog DB Model
 class Blog(db.Model):
@@ -126,7 +137,7 @@ class BlogPage(BlogHandler):
         length = 0
         for p in posts_all:
             length += 1
-            
+
         isLastPage = False
         if count * 10 > length:
             isLastPage = True
