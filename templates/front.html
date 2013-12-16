@@ -5,6 +5,9 @@
 <div class="row">
 	<div class="col-xs-5 col-sm-3">
 		<ul class="nav nav-list">
+			{% if isLogin %}
+			<li class="active"><a href="/profile?author={{ isLogin }}"><h4>Your Blogs</h4></a></li>
+			{% endif %}
 			<li class="nav-header"><h3>Blog List</h3></li>
 			{% for b in blogs %}
 			<li>
@@ -16,8 +19,9 @@
 	</div>
 	<div class="col-xs-11 col-sm-7">
 		<h3>Latest Posts</h3>
+		<br>
 		{% for p in posts %}
-		{{ p.render() | safe }}
+		{{ p.render_digest() | safe }}
 		<a href='/post?post_id={{ p.key().id() }}'>more...</a>
 		<br><br>
 		{% endfor %}

@@ -56,11 +56,18 @@ class Post(db.Model):
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
-        return render_str("post.html", p = self)
+        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self._render_text)
+
+    def render_digest(self):
+        if len(self.content) > 500:
+            self.digest = self.content[0:500].replace('\n', '<br>')
+            return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self.digest)
+        else:
+            return render(self)
 
 # Blog DB Model
 class Blog(db.Model):
-    blog_name = db.StringProperty(required = True)
+    blog_name = db.StringProperty(required = True, indexed=True)
     author = db.StringProperty(required = True)
 
 

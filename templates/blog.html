@@ -7,7 +7,7 @@
 	<br><br>
 	
 	{% for p in posts %}
-	{{ p.render() | safe }}
+	{{ p.render_digest() | safe }}
 	<a href='/post?post_id={{ p.key().id() }}'>more...</a>
 	<br><br>
 	{% endfor %}
