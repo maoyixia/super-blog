@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<br>
 {{post.render() | safe}}
-<br><br>
+<br>
 
 <div>
 	{% if isOwner %}
@@ -14,6 +15,6 @@
 	</div>
 	<br>
 	<div>
-		<h4><a href="/blog?blog_name={{ blog_name }}">Return to blog {{ blog_name }}</a><br></h4>
+		<h4><a href="/blog?blog_name={{ blog_name }}&page=1">Return to blog {{ blog_name }}</a><br></h4>
 	</div>
 	{% endblock %}

@@ -118,9 +118,25 @@ class BlogPage(BlogHandler):
             if isLogin == author:
                 isOwner = True
 
-        posts = db.GqlQuery("SELECT * FROM Post WHERE blog_name = :1 ORDER BY created DESC LIMIT 10", blog_name)
+        count = int(self.request.get('page')) 
+        next_count = count+1
+        posts_all = db.GqlQuery("SELECT * FROM Post WHERE blog_name = :1 ORDER BY created DESC", blog_name)
+        posts = []
+
+        length = 0
+        for p in posts_all:
+            length += 1
+            
+        isLastPage = False
+        if count * 10 > length:
+            isLastPage = True
+            for i in range((count-1)*10, (count-1)*10 + length%10):
+                posts.append(posts_all[i])
+        else:
+            for i in range((count-1)*10, count*10):
+                posts.append(posts_all[i])
         login_value = login(self)
-        self.render('blog.html', blog_name = blog_name, author = author, posts = posts, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
+        self.render('blog.html', blog_name = blog_name, author = author, posts = posts, isLastPage = isLastPage, next_count = next_count, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
 
 
 class PostPage(BlogHandler):

@@ -7,12 +7,12 @@
   	<ul>
   		{% for b in blogs %}
   		<li>
-  			<h3><a href="/blog?blog_name={{ b.blog_name }}">{{ b.blog_name }}</a></h3>
-  			<br>
+  			<h3><a href="/blog?blog_name={{ b.blog_name }}&page=1">{{ b.blog_name }}</a></h3>
   		</li>
   		{% endfor %}
   	</ul>
   </div>
+  <br>
 
 {% if isOwner %}
   <div>

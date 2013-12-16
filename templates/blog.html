@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>{{blog_name}}</h1>
-<h4>Blogger: {{author}}<h4>
+<h4>Author: {{author}}<h4>
 	<br>
 
 	{% if isOwner %}
@@ -19,6 +19,10 @@
 	<br><br>
 	{% endfor %}
 	
+	{% if not isLastPage %}
+	<h4><a href="/blog?blog_name={{ blog_name }}&page={{ next_count }}">previous posts</a></h4>
+	{% endif %}
+	<br>
 	{% if isOwner %}
 	<div>
 		<h3><a href="/profile?author={{ author }}">Return to Profile</a></h3>

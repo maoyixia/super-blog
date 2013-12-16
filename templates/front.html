@@ -13,7 +13,7 @@
 			<li class="nav-header"><h3>Blog List</h3></li>
 			{% for b in blogs %}
 			<li>
-				<a href="/blog?blog_name={{ b.blog_name }}">{{ b.blog_name }}</a> 
+				<a href="/blog?blog_name={{ b.blog_name }}&page=1">{{ b.blog_name }}</a> 
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by {{ b.author }}
 			</li>
 			{% endfor %}
