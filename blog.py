@@ -326,7 +326,7 @@ class ImagePage(BlogHandler):
 
 class NewImage(BlogHandler):
     def get(self):
-        self.render("newimage.html")
+        self.render('newimage.html')
         
     def post(self):
         image_name = self.request.get('image_name')
@@ -343,6 +343,15 @@ class NewImage(BlogHandler):
             self.render("newimage.html", image_name=image_name, image=image, author = author, error=error)
 
 
+class BlogRSS(BlogHandler):
+    def get(self):
+        blog_name = self.request.get('blog_name')
+        blog_query = db.GqlQuery("SELECT * FROM Blog WHERE blog_name = :1", blog_name)
+        blog = blog_query.get()
+        author = blog.author
+        posts = db.GqlQuery("SELECT * FROM Post WHERE blog_name = :1 ORDER BY created DESC", blog_name)
+        self.render('RSS.xml', blog = blog, posts = posts)
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/profile', Profile),
                                ('/blog', BlogPage),
@@ -355,5 +364,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/album', AlbumPage),
                                ('/image', ImagePage),
                                ('/newimage', NewImage),
+                               ('/blogRSS', BlogRSS),
                                ],
                               debug=True)
