@@ -79,6 +79,13 @@ class Blog(db.Model):
     blog_name = db.StringProperty(required = True, indexed=True)
     author = db.StringProperty(required = True)
 
+# Album DB Model
+class Album(db.Model):
+    author = db.StringProperty(required = True)
+    image = db.BlobProperty(required = True)
+    image_name = db.StringProperty(required = True)
+    created = db.DateTimeProperty(auto_now_add = True)
+
 
 class MainPage(BlogHandler):
     def get(self):
@@ -208,7 +215,6 @@ def splitTags(tags_string):
 
 
 class NewPost(BlogHandler):
-
     def get(self):
         self.render("newpost.html")
         
@@ -229,7 +235,6 @@ class NewPost(BlogHandler):
             self.render("newpost.html", subject=subject, content=content, tags = tags, author = author, error=error)
 
 class EditPost(BlogHandler):
-
     def get(self):
         post_id = self.request.get('post_id')
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -265,7 +270,6 @@ class EditPost(BlogHandler):
             self.render("newpost.html", subject=subject, content=content, author = author, tags = tags, error=error)
 
 class DelPost(BlogHandler):
-
     def get(self):
         post_id = self.request.get('post_id')
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -276,12 +280,67 @@ class DelPost(BlogHandler):
         self.redirect('/blog?blog_name=%s' % blog_name)
 
 class TagPost(BlogHandler):
-
     def get(self):
         tag = self.request.get('tag')
         posts = db.GqlQuery("SELECT * FROM Post WHERE tags = :1 ORDER BY created DESC", tag)
-        print posts
         self.render("tagpost.html", posts = posts, tag = tag)
+
+class AlbumPage(BlogHandler):
+    def get(self):
+        author = self.request.get('author')
+        images = db.GqlQuery("SELECT * FROM Album WHERE author = :1 ORDER BY created DESC", author)
+
+        # check if user has logged in and is owner
+        isLogin = False
+        isOwner = False
+        if users.get_current_user():
+            isLogin = users.get_current_user().nickname()
+            if isLogin == author:
+                isOwner = True
+
+        login_value = login(self)
+        self.render('album.html', images = images, author = author, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
+
+class ImagePage(BlogHandler):
+    def get(self):
+        image_id = self.request.get('image_id')
+        key = db.Key.from_path('Album', int(image_id))
+        image = db.get(key)
+        image_name = image.image_name
+        author = image.author
+
+        # check if user has logged in and is owner
+        isLogin = False
+        isOwner = False
+        if users.get_current_user():
+            isLogin = users.get_current_user().nickname()
+            if isLogin == author:
+                isOwner = True
+
+        if not image:
+            self.error(404)
+            return
+
+        self.response.headers['Content-Type'] = 'image/png'
+        self.response.out.write(image.image)
+
+class NewImage(BlogHandler):
+    def get(self):
+        self.render("newimage.html")
+        
+    def post(self):
+        image_name = self.request.get('image_name')
+        image = self.request.get('img')
+        author = str(users.get_current_user().nickname())
+
+        if image_name and image:
+            i = Album(image_name = image_name, image = image, author = author)
+            i.put()
+            time.sleep(1)
+            self.redirect('/album?author=%s' % author)
+        else:
+            error = "Please upload your image!"
+            self.render("newimage.html", image_name=image_name, image=image, author = author, error=error)
 
 
 app = webapp2.WSGIApplication([('/', MainPage),
@@ -293,5 +352,8 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/editpost', EditPost),
                                ('/delpost', DelPost),
                                ('/tagpost', TagPost),
+                               ('/album', AlbumPage),
+                               ('/image', ImagePage),
+                               ('/newimage', NewImage),
                                ],
                               debug=True)

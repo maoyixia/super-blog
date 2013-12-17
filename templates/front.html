@@ -6,7 +6,8 @@
 	<div class="col-xs-3 col-sm-3">
 		<ul class="nav nav-list">
 			{% if isLogin %}
-			<li class="active"><a href="/profile?author={{ isLogin }}"><h4>Your Blogs</h4></a></li>
+			<li class="active"><a href="/profile?author={{ isLogin }}"><h4>My Blogs</h4></a></li>
+			<li class="active"><a href="/album?author={{ isLogin }}"><h4>My Album</h4></a></li>
 			{% else %}
 			<li class="active"><a href="{{ url|safe }}"><h4>{{ url_linktext }} and Create your own blogs!</h4></a></li>			
 			{% endif %}

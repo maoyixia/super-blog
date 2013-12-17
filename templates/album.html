@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Hi, {{ author }}! Your album:</h2>
+<div>
+	{% if images %}
+	<ul>
+		{% for i in images %}
+		<li>
+			<h4><a href="/image?image_id={{ i.key().id() }}">{{ i.image_name }}</a></h4>
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>
+
+{% if isOwner %}
+<div>
+	<h4><a href="/newimage?author={{author}}">Upload a New Image</a></h4>
+</div>
+{% endif %}	
+
+{% endblock %}
