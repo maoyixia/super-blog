@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="row">
-	<div class="col-xs-5 col-sm-3">
+	<div class="col-xs-3 col-sm-3">
 		<ul class="nav nav-list">
 			{% if isLogin %}
 			<li class="active"><a href="/profile?author={{ isLogin }}"><h4>Your Blogs</h4></a></li>
@@ -28,6 +28,17 @@
 		<br><br>
 		{% endfor %}
 	</div>
+	{% if tags_set %}
+	<div class="col-xs-4 col-sm-2">
+		<h3>Tag List:</h3>
+		<ul>
+			{% for t in tags_set %}
+			<li><a href="/tagpost?tag={{ t }}">{{ t }}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+	{% endif %}
+
 </div>
 
 {% endblock %}

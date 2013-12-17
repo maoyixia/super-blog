@@ -17,7 +17,18 @@
     {{_render_text | safe}}
   </div>
 
+  {% if tags %}
+  <div>
+    <br>
+    Tags:
+    {% for t in tags %}
+      <a href="/tagpost?tag={{ t }}">{{ t }}</a>&nbsp;
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <br>
+
   <div>
     last modified at: {{ last_modified.strftime("%b %d, %Y") }}
   </div>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<h2>Tag: {{ tag }}</h2>
+	<h3>results:</h3> 
+	<br>
+	{% for p in posts %}
+	{{ p.render_digest() | safe }}
+	<a href='/post?post_id={{ p.key().id() }}'>more...</a>
+	<br><br>
+	{% endfor %}
+
+	<h4><a href='/'>Return to Super Blog</a></h4>
+
+{% endblock %}

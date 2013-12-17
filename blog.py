@@ -1,6 +1,7 @@
 import os
 import re
 from string import letters
+from sets import Set
 
 import webapp2
 import jinja2
@@ -63,15 +64,15 @@ class Post(db.Model):
     content = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
     last_modified = db.DateTimeProperty(auto_now = True)
-    # tags = db.StringProperty(repeated=True)
+    tags = db.StringListProperty(indexed = True)
 
     def render(self):
         self._render_text = contentParser(self.content).replace('\n', '<br>')
-        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self._render_text, last_modified = self.last_modified)
+        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self._render_text, last_modified = self.last_modified, tags = self.tags)
 
     def render_digest(self):
         self.digest = contentParser(self.content[0:500]).replace('\n', '<br>')
-        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self.digest, last_modified = self.last_modified)
+        return render_str("post.html", subject = self.subject, author = self.author, created = self.created, _render_text = self.digest, last_modified = self.last_modified, tags = self.tags)
 
 # Blog DB Model
 class Blog(db.Model):
@@ -87,13 +88,20 @@ class MainPage(BlogHandler):
         for b in blogs_query.run():
             blogs.append(b)
 
+        tags_all = []
+        for p in posts:
+            for t in p.tags:
+                if t:
+                    tags_all.append(t)
+        tags_set = Set(tags_all)
+
         # check if user has logged in
         isLogin = False
         if users.get_current_user():
             isLogin = users.get_current_user().nickname()
 
         login_value = login(self)
-        self.render('front.html', posts = posts, blogs = blogs, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin)
+        self.render('front.html', posts = posts, blogs = blogs, tags_set = tags_set, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin)
 
 class Profile(BlogHandler):
     def get(self):
@@ -189,6 +197,16 @@ class NewBlog(BlogHandler):
             error = "Please type in blog name!"
             self.render("newblog.html", blog_name = blog_name, author = author, error=error)
 
+# split input tags string into tags
+def splitTags(tags_string):
+    tags = []
+    if tags_string:
+        split = tags_string.split(';')
+        for s in split:
+            tags.append(s.strip(' \t\n\r'))
+    return tags
+
+
 class NewPost(BlogHandler):
 
     def get(self):
@@ -197,16 +215,18 @@ class NewPost(BlogHandler):
     def post(self):
         subject = self.request.get('subject')
         content = self.request.get('content')
+        tags_string = self.request.get('tags')
+        tags = splitTags(tags_string)
         author = str(users.get_current_user().nickname())
         blog_name = self.request.get('blog_name')
 
         if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content, author = author, blog_name = blog_name)
+            p = Post(parent = blog_key(), subject = subject, content = content, tags = tags, author = author, blog_name = blog_name)
             p.put()
             self.redirect('/post?post_id=%s' % str(p.key().id()))
         else:
             error = "Please type in subject and content!"
-            self.render("newpost.html", subject=subject, content=content, author = author, error=error)
+            self.render("newpost.html", subject=subject, content=content, tags = tags, author = author, error=error)
 
 class EditPost(BlogHandler):
 
@@ -216,7 +236,12 @@ class EditPost(BlogHandler):
         post = db.get(key)
         subject = post.subject
         content = post.content
-        self.render("newpost.html", subject = subject, content = content)
+        tags = post.tags
+        tags_string = ""
+        if tags:
+            for t in tags:
+                tags_string += t + '; '
+        self.render("newpost.html", subject = subject, content = content, tags = tags_string)
 
     def post(self):
         post_id = self.request.get('post_id')
@@ -224,17 +249,20 @@ class EditPost(BlogHandler):
         post = db.get(key)
         subject = self.request.get('subject')
         content = self.request.get('content')
+        tags_string = self.request.get('tags')
+        tags = splitTags(tags_string)
         author = str(users.get_current_user().nickname())
         blog_name = self.request.get('blog_name')
 
         if subject and content:
             post.subject = subject
             post.content = content
+            post.tags = tags
             post.put()
             self.redirect('/post?post_id=%s' % str(post.key().id()))
         else:
             error = "Please type in subject and content!"
-            self.render("newpost.html", subject=subject, content=content, author = author, error=error)
+            self.render("newpost.html", subject=subject, content=content, author = author, tags = tags, error=error)
 
 class DelPost(BlogHandler):
 
@@ -247,6 +275,14 @@ class DelPost(BlogHandler):
         time.sleep(1)
         self.redirect('/blog?blog_name=%s' % blog_name)
 
+class TagPost(BlogHandler):
+
+    def get(self):
+        tag = self.request.get('tag')
+        posts = db.GqlQuery("SELECT * FROM Post WHERE tags = :1 ORDER BY created DESC", tag)
+        print posts
+        self.render("tagpost.html", posts = posts, tag = tag)
+
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/profile', Profile),
@@ -256,5 +292,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                ('/editpost', EditPost),
                                ('/delpost', DelPost),
+                               ('/tagpost', TagPost),
                                ],
                               debug=True)

@@ -17,6 +17,18 @@ indexes:
     direction: desc
 
 - kind: Post
+  properties:
+  - name: tags
+  - name: createTime
+    direction: desc
+
+- kind: Post
+  properties:
+  - name: tags
+  - name: created
+    direction: desc
+
+- kind: Post
   ancestor: yes
   properties:
   - name: created
