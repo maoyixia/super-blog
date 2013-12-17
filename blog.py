@@ -1,14 +1,13 @@
 import os
 import re
-from string import letters
-from sets import Set
-
 import webapp2
 import jinja2
 import time
 
 from google.appengine.ext import db
 from google.appengine.api import users
+from string import letters
+from sets import Set
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -18,7 +17,7 @@ def render_str(template, **params):
     t = jinja_env.get_template(template)
     return t.render(params)
 
-# Wrapper on RequestHandler
+# Wrapper on RequestHandler for passing parameters into jinja template easier
 class BlogHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -29,10 +28,7 @@ class BlogHandler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
-def render_post(response, post):
-    response.out.write('<b>' + post.subject + '</b><br>')
-    response.out.write(post.content)
-
+# helper method for checking whether user already login or not, and return corresponding Google account url and display text
 def login(class_name):
     if users.get_current_user():
         url = users.create_logout_url(class_name.request.uri)
@@ -56,6 +52,7 @@ def contentParser(mystr):
             result = result.replace(i, '<a href="' + i + '">' + i + '</a>')
     return result
 
+##Database Design
 # Post DB Model
 class Post(db.Model):
     author = db.StringProperty(required = True)
@@ -87,6 +84,8 @@ class Album(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
 
 
+##Action Handler
+# MainPage, index page
 class MainPage(BlogHandler):
     def get(self):
         posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
@@ -110,6 +109,7 @@ class MainPage(BlogHandler):
         login_value = login(self)
         self.render('front.html', posts = posts, blogs = blogs, tags_set = tags_set, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin)
 
+# User profile, contains all the blog list of user
 class Profile(BlogHandler):
     def get(self):
         author = self.request.get('author')
@@ -129,6 +129,7 @@ class Profile(BlogHandler):
         login_value = login(self)
         self.render('profile.html', blogs = blogs, author = author, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
 
+# Blog page, contains post list, RSS, create new post
 class BlogPage(BlogHandler):
     def get(self):
         blog_name = self.request.get('blog_name')
@@ -153,6 +154,7 @@ class BlogPage(BlogHandler):
         for p in posts_all:
             length += 1
 
+        # find posts display list according to page number
         isLastPage = False
         if count * 10 > length:
             isLastPage = True
@@ -161,10 +163,11 @@ class BlogPage(BlogHandler):
         else:
             for i in range((count-1)*10, count*10):
                 posts.append(posts_all[i])
+
         login_value = login(self)
         self.render('blog.html', blog_name = blog_name, author = author, posts = posts, isLastPage = isLastPage, next_count = next_count, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
 
-
+# Post page, contains edit post and delete post
 class PostPage(BlogHandler):
     def get(self):
         post_id = self.request.get('post_id')
@@ -187,6 +190,7 @@ class PostPage(BlogHandler):
 
         self.render("permalink.html", post_id = post_id, post = post, blog_name = blog_name, isLogin = isLogin, isOwner = isOwner)
 
+# Create new blog handler
 class NewBlog(BlogHandler):
     def get(self):
         self.render("newblog.html")
@@ -204,7 +208,7 @@ class NewBlog(BlogHandler):
             error = "Please type in blog name!"
             self.render("newblog.html", blog_name = blog_name, author = author, error=error)
 
-# split input tags string into tags
+# helper method for spliting input tags string into tags
 def splitTags(tags_string):
     tags = []
     if tags_string:
@@ -213,7 +217,7 @@ def splitTags(tags_string):
             tags.append(s.strip(' \t\n\r'))
     return tags
 
-
+# Create new post and tags
 class NewPost(BlogHandler):
     def get(self):
         self.render("newpost.html")
@@ -234,6 +238,7 @@ class NewPost(BlogHandler):
             error = "Please type in subject and content!"
             self.render("newpost.html", subject=subject, content=content, tags = tags, author = author, error=error)
 
+# Edit post handler, and update post information in Database
 class EditPost(BlogHandler):
     def get(self):
         post_id = self.request.get('post_id')
@@ -242,10 +247,13 @@ class EditPost(BlogHandler):
         subject = post.subject
         content = post.content
         tags = post.tags
+
+        # convert tags list to plain text string
         tags_string = ""
         if tags:
             for t in tags:
                 tags_string += t + '; '
+
         self.render("newpost.html", subject = subject, content = content, tags = tags_string)
 
     def post(self):
@@ -269,6 +277,7 @@ class EditPost(BlogHandler):
             error = "Please type in subject and content!"
             self.render("newpost.html", subject=subject, content=content, author = author, tags = tags, error=error)
 
+# Delete post handler, and delete post in Database
 class DelPost(BlogHandler):
     def get(self):
         post_id = self.request.get('post_id')
@@ -279,12 +288,14 @@ class DelPost(BlogHandler):
         time.sleep(1)
         self.redirect('/blog?blog_name=%s' % blog_name)
 
+# Display all posts belong to a tag category
 class TagPost(BlogHandler):
     def get(self):
         tag = self.request.get('tag')
         posts = db.GqlQuery("SELECT * FROM Post WHERE tags = :1 ORDER BY created DESC", tag)
         self.render("tagpost.html", posts = posts, tag = tag)
 
+# User album page, contains list of links to uploaded images 
 class AlbumPage(BlogHandler):
     def get(self):
         author = self.request.get('author')
@@ -301,6 +312,7 @@ class AlbumPage(BlogHandler):
         login_value = login(self)
         self.render('album.html', images = images, author = author, url = login_value[0], url_linktext = login_value[1], isLogin = isLogin, isOwner = isOwner)
 
+# Display one image
 class ImagePage(BlogHandler):
     def get(self):
         image_id = self.request.get('image_id')
@@ -324,6 +336,7 @@ class ImagePage(BlogHandler):
         self.response.headers['Content-Type'] = 'image/png'
         self.response.out.write(image.image)
 
+# Upload new image
 class NewImage(BlogHandler):
     def get(self):
         self.render('newimage.html')
@@ -342,7 +355,7 @@ class NewImage(BlogHandler):
             error = "Please upload your image!"
             self.render("newimage.html", image_name=image_name, image=image, author = author, error=error)
 
-
+# RSS of blog
 class BlogRSS(BlogHandler):
     def get(self):
         blog_name = self.request.get('blog_name')
@@ -351,6 +364,10 @@ class BlogRSS(BlogHandler):
         author = blog.author
         posts = db.GqlQuery("SELECT * FROM Post WHERE blog_name = :1 ORDER BY created DESC", blog_name)
         self.render('RSS.xml', blog = blog, posts = posts)
+
+class Contact(BlogHandler):
+    def get(self):
+        self.render('about.html')
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/profile', Profile),
@@ -365,5 +382,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/image', ImagePage),
                                ('/newimage', NewImage),
                                ('/blogRSS', BlogRSS),
+                               ('/contact', Contact),
                                ],
                               debug=True)
