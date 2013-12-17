@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+
+<channel>
+  <title>{{blog.blog_name}}</title>
+  <link>{{blog.blog_name}}</link>
+  {% for p in posts %}
+  <item>
+    <title>{{ p.subject }}</title>
+    <pubDate>{{ p.created }}</pubDate>
+    <description>{{ p.content | safe }}</description>
+  </item>
+  {% endfor %}
+</channel>
+
+</rss>
