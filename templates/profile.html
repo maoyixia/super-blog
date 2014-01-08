@@ -1,23 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row">
+  <div class="col-md-3"></div>
+  <div class="col-md-6">
 
-<h2>Hi, {{ author }}! Your blogs:</h2>
-  <div>
-  	<ul>
-  		{% for b in blogs %}
-  		<li>
-  			<h3><a href="/blog?blog_name={{ b.blog_name }}&page=1">{{ b.blog_name }}</a></h3>
-  		</li>
-  		{% endfor %}
-  	</ul>
-  </div>
-  <br>
+    <h2>Hi, {{ author }}! Your blogs:</h2>
+    <div>
+     <ul>
+      {% for b in blogs %}
+      <li>
+        <p><a href="/blog?blog_name={{ b.blog_name }}&page=1">{{ b.blog_name }}</a></p>
+     </li>
+     {% endfor %}
+   </ul>
+ </div>
+ <br>
 
-{% if isOwner %}
-  <div>
-  	<h4><a href="/newblog">Create a New Blog</a></h4>
-  </div>
-{% endif %}
-
+ {% if isOwner %}
+ <div>
+   <h4><a href="/newblog">Create a New Blog</a></h4>
+ </div>
+ {% endif %}
+</div>
+</div>
 {% endblock %}

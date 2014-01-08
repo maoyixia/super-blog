@@ -1,20 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<br>
-{{post.render() | safe}}
-<br>
+<div class="row">
+	<div class="col-md-3"></div>
+	<div class="col-md-6">
+		<br>
+		{{post.render() | safe}}
+		<br>
 
-<div>
-	{% if isOwner %}
-	<h3><a href="/editpost?post_id={{ post_id }}">Edit</a>
-		&nbsp; | &nbsp;
-		<a href="/delpost?post_id={{ post_id }}">Delete</a>
-	</h3>
-	{% endif %}
+		<div>
+			{% if isOwner %}
+			<h3><a href="/editpost?post_id={{ post_id }}">Edit</a>
+				&nbsp; | &nbsp;
+				<a href="/delpost?post_id={{ post_id }}">Delete</a>
+			</h3>
+			{% endif %}
+		</div>
+		<br>
+		<div>
+			<h4><a href="/blog?blog_name={{ blog_name }}&page=1">Return to blog {{ blog_name }}</a><br></h4>
+		</div>
 	</div>
-	<br>
-	<div>
-		<h4><a href="/blog?blog_name={{ blog_name }}&page=1">Return to blog {{ blog_name }}</a><br></h4>
-	</div>
-	{% endblock %}
+</div>
+{% endblock %}

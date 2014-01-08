@@ -1,33 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row">
+	<div class="col-md-3"></div>
+	<div class="col-md-6">
+		<h2 class="text-center">{{blog_name}}</h2>
+		<h4 class="text-center">author: {{author}}<h4>
+			{% if isOwner %}
+			<h4><a href="/newpost?blog_name={{ blog_name }}">Create a New Post</a></h4>
+			{% endif %}	
+			<br>
 
-<h1>{{blog_name}}</h1>
-<h4>Author: {{author}}<h4>
-<h3><a href="/blogRSS?blog_name={{ blog_name }}">RSS</a></h3>
-	<br>
+			{% for p in posts %}
+			{{ p.render_digest() | safe }}
+			<a href='/post?post_id={{ p.key().id() }}'>more...</a>
+			<br><br>
+			{% endfor %}
 
-	{% if isOwner %}
-	<div>
-		<h3><a href="/newpost?blog_name={{ blog_name }}">Create a New Post</a></h3>
+			{% if not isLastPage %}
+			<h4><a href="/blog?blog_name={{ blog_name }}&page={{ next_count }}">previous posts</a></h4>
+			{% endif %}
+			<br>
+			{% if isOwner %}
+			<div>
+				<h4><a href="/profile?author={{ author }}">Return to Profile</a></h4>
+			</div>
+			{% endif %}
+			<h4><a href="/blogRSS?blog_name={{ blog_name }}">RSS</a></h4>
+		</div>
 	</div>
-	{% endif %}	
-	<br>
-
-	{% for p in posts %}
-	{{ p.render_digest() | safe }}
-	<a href='/post?post_id={{ p.key().id() }}'>more...</a>
-	<br><br>
-	{% endfor %}
-	
-	{% if not isLastPage %}
-	<h4><a href="/blog?blog_name={{ blog_name }}&page={{ next_count }}">previous posts</a></h4>
-	{% endif %}
-	<br>
-	{% if isOwner %}
-	<div>
-		<h3><a href="/profile?author={{ author }}">Return to Profile</a></h3>
-	</div>
-	{% endif %}
-
 	{% endblock %}

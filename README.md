@@ -1,4 +1,4 @@
-Super-Blog
+One-Blog
 ==========
 
 Author: Yixia Mao
@@ -56,7 +56,7 @@ Future work:
 
 Design and Development:
 
-This project backend was written in Python. Front end UI used Bootstrap framework and, thanks for Twitter Bootstrap development team that greatly easy my UI work. In addition, HTML rendering used Jinja2 templates.
+This project backend was written in Python. Front end UI used Bootstrap framework, thanks for Twitter Bootstrap development team that greatly easy my UI work. In addition, HTML rendering used Jinja2 template engine.
 
 This project was deployed on Google App Engine, and used its data store as database.
 

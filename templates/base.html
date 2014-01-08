@@ -7,9 +7,9 @@
  <title>Yixia Blog</title>
 </head>
 
-<body>
-  <div class="”container”">
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<body style>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
       <!-- Static navbar -->
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -18,7 +18,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/">Super Blog</a>
+        <a class="navbar-brand" href="/">One Blog</a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -44,10 +44,16 @@
           <li><a href="/contact">Contact</a></li>
         </ul>
       </div><!-- /.navbar-collapse -->
-    </nav>
-    <br><br><br><br>
+    </div>
+  </nav>
+  <br><br><br><br>
+  <div class="container">
     {% block content %}
     {% endblock %}
+    <hr>
+    <footer>
+      <p class="text-center">© Yixia Mao</p>
+    </footer>
   </div>
 
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>

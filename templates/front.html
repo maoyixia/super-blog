@@ -3,13 +3,13 @@
 {% block content %}
 
 <div class="row">
-	<div class="col-xs-3 col-sm-3">
+	<div class="col-md-3">
 		<ul class="nav nav-list">
 			{% if isLogin %}
 			<li class="active"><a href="/profile?author={{ isLogin }}"><h4>My Blogs</h4></a></li>
 			<li class="active"><a href="/album?author={{ isLogin }}"><h4>My Album</h4></a></li>
 			{% else %}
-			<li class="active"><a href="{{ url|safe }}"><h4>{{ url_linktext }} and Create your own blogs!</h4></a></li>			
+			<li class="active"><a href="{{ url|safe }}"><h3>Create your blogs</h3></a></li>			
 			{% endif %}
 			<li class="nav-header"><h3>Blog List</h3></li>
 			{% for b in blogs %}
@@ -20,7 +20,7 @@
 			{% endfor %}
 		</ul>
 	</div>
-	<div class="col-xs-11 col-sm-7">
+	<div class="col-md-6">
 		<h3>Latest Posts</h3>
 		<br>
 		{% for p in posts %}
@@ -30,7 +30,7 @@
 		{% endfor %}
 	</div>
 	{% if tags_set %}
-	<div class="col-xs-4 col-sm-2">
+	<div class="col-md-3">
 		<h3>Tag List:</h3>
 		<ul>
 			{% for t in tags_set %}
@@ -39,7 +39,6 @@
 		</ul>
 	</div>
 	{% endif %}
-
 </div>
 
 {% endblock %}
